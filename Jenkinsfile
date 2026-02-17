@@ -9,9 +9,9 @@ pipeline {
     environment {
         TF_DIRECTORY = 'terraform'
         ANSIBLE_DIRECTORY = 'ansible'
-        AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_DEFAULT_REGION = 'ap-south-1'
         // Jenkins maps 'aws-keys' to AWS_CREDS_USR and AWS_CREDS_PSW automatically
-        AWS_CREDS = credentials('aws-keys')
+        AWS_CREDS = credentials('aws-creds')
 
         LANG = 'en_US.UTF-8'
         LC_ALL = 'en_US.UTF-8'
@@ -26,10 +26,10 @@ pipeline {
 
         stage('Terraform Infrastructure') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'aws-keys', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'), sshUserPrivateKey(credentialsId: 'my-server-ssh-key-v1', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'), sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     dir("${env.TF_DIRECTORY}") {
                         // Copy SSH key for Terraform to use
-                        sh "rm -f /tmp/one__click.pem && cp ${SSH_KEY} /tmp/one__click.pem && chmod 400 /tmp/one__click.pem"
+                        sh "rm -f /tmp/mumbai.pem && cp ${SSH_KEY} /tmp/mumbai.pem && chmod 400 /tmp/mumbai.pem"
                         
                         // Added -input=false and -force-copy to stop Terraform from asking for manual input
                         sh 'terraform init -input=false'
@@ -58,11 +58,11 @@ pipeline {
         stage('Ansible Configuration - MongoDB') {
             when { expression { params.TF_ACTION == 'apply' } }
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'my-server-ssh-key-v1', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     dir("${env.ANSIBLE_DIRECTORY}") {
                         // Copy SSH key for Ansible to use
-                        sh "rm -f /tmp/one__click.pem && cp ${SSH_KEY} /tmp/one__click.pem && chmod 400 /tmp/one__click.pem"
-                        sh "ansible-playbook -i inventory.ini playbook.yml --private-key=/tmp/one__click.pem -u ubuntu"
+                        sh "rm -f /tmp/mumbai.pem && cp ${SSH_KEY} /tmp/mumbai.pem && chmod 400 /tmp/mumbai.pem"
+                        sh "ansible-playbook -i inventory.ini playbook.yml --private-key=/tmp/mumbai.pem -u ubuntu"
                     }
                 }
             }
@@ -72,13 +72,13 @@ pipeline {
     post { 
         always { 
             // Cleanup sensitive files and workspace
-            sh 'rm -f /tmp/one__click.pem' 
+            sh 'rm -f /tmp/mumbai.pem' 
             cleanWs()
         }
         success {
            // Send Email notification on Success
-            mail to: 'bhavna123porwal@gmail.com',
-                 from: 'bhavna123porwal@gmail.com',
+            mail to: 'sakshit1441@gmail.com',
+                 from: 'sakshit1441@gmail.com',
                  subject: "Success: ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
                  body: "Check details at ${env.BUILD_URL}"
         }
@@ -86,8 +86,8 @@ pipeline {
         failure {
 
             // Send Email notification on Failure
-            mail to: 'bhavna123porwal@gmail.com',
-                 from: 'bhavna123porwal@gmail.com',
+            mail to: 'sakshit1441@gmail.com',
+                 from: 'sakshit1441@gmail.com',
                  subject: "FAILURE: ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
                  body: "The build failed. Please check the logs at ${env.BUILD_URL}"
         }
