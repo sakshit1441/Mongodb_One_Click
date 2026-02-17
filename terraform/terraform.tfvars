@@ -1,12 +1,12 @@
 ami_id        = "ami-0c398cb65a93047f2"
 instance_type = "t2.micro"
-key_name      = "one__click"
+key_name      = "mumbai.pem"
 ssh_cidr      = ["0.0.0.0/0"]
 
 common_tags = {
   Project     = "terraform-assignment"
   Environment = "dev"
-  Owner       = "bhawna"
+  Owner       = "sakshi"
 }
 
 vpc_cidr      = "10.0.0.0/16"
@@ -15,7 +15,7 @@ private_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
 alb_name      = "mongodb-alb"
 asg_name      = "mongodb-asg"
 ansible_user  = "ubuntu"
-ssh_key_path  = "/tmp/one__click.pem"
+ssh_key_path  = "/tmp/mumbai.pem"
 alb_port      = 80
 vpc_name      = "mongodb-vpc"
 igw_name      = "mongodb-igw"
