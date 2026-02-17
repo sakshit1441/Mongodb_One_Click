@@ -12,7 +12,7 @@
     groups: bastion
     ansible_host: "{{ tf_output.outputs.bastion_public_ip.value }}"
     ansible_user: ubuntu
-    ansible_ssh_private_key_file: "../one__click.pem"
+    ansible_ssh_private_key_file: "../ mumbai.pem"
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
 - name: Add Private Instances to Inventory
@@ -21,7 +21,7 @@
     groups: mongodb
     ansible_host: "{{ item }}"
     ansible_user: ubuntu
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o ProxyCommand='ssh -W %h:%p -q -o StrictHostKeyChecking=no -i ../one__click.pem ubuntu@{{ tf_output.outputs.bastion_public_ip.value }}'"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o ProxyCommand='ssh -W %h:%p -q -o StrictHostKeyChecking=no -i ../ mumbai.pem ubuntu@{{ tf_output.outputs.bastion_public_ip.value }}'"
   with_items: "{{ tf_output.outputs.private_instance_ips.value }}"
 
 - name: Wait for Bastion SSH to be ready
