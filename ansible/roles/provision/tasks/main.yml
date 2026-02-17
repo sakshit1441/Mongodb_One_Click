@@ -1,0 +1,34 @@
+---
+- name: Apply Terraform
+  terraform:
+    project_path: "../terraform"
+    state: present
+    force_init: true
+  register: tf_output
+
+- name: Add Bastion to Inventory
+  add_host:
+    name: "bastion_host"
+    groups: bastion
+    ansible_host: "{{ tf_output.outputs.bastion_public_ip.value }}"
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: "../one__click.pem"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+
+- name: Add Private Instances to Inventory
+  add_host:
+    name: "{{ item }}"
+    groups: mongodb
+    ansible_host: "{{ item }}"
+    ansible_user: ubuntu
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o ProxyCommand='ssh -W %h:%p -q -o StrictHostKeyChecking=no -i ../one__click.pem ubuntu@{{ tf_output.outputs.bastion_public_ip.value }}'"
+  with_items: "{{ tf_output.outputs.private_instance_ips.value }}"
+
+- name: Wait for Bastion SSH to be ready
+  wait_for:
+    port: 22
+    host: "{{ tf_output.outputs.bastion_public_ip.value }}"
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 300
+    state: started
