@@ -54,12 +54,12 @@ resource "null_resource" "copy_key" {
 
   provisioner "file" {
     source      = var.ssh_key_path
-    destination = "/home/ubuntu/one__click.pem"
+    destination = "/home/ubuntu/mumbai_key"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "chmod 400 /home/ubuntu/one__click.pem"
+      "chmod 400 /home/ubuntu/mumbai_key"
     ]
   }
 }
