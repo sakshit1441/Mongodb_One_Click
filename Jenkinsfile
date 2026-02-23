@@ -11,7 +11,7 @@ pipeline {
         ANSIBLE_DIRECTORY = 'ansible'
         AWS_DEFAULT_REGION = 'ap-south-1'
         // Jenkins maps 'aws-keys' to AWS_CREDS_USR and AWS_CREDS_PSW automatically
-        AWS_CREDS = credentials('aws-creds')
+        AWS_CREDS = credentials('aws-cred')
 
         LANG = 'en_US.UTF-8'
         LC_ALL = 'en_US.UTF-8'
@@ -26,7 +26,7 @@ pipeline {
 
         stage('Terraform Infrastructure') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'), sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'aws-cred', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'), sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     dir("${env.TF_DIRECTORY}") {
                         // Copy SSH key for Terraform to use
                         sh "rm -f /tmp/mumbai.pem && cp ${SSH_KEY} /tmp/mumbai.pem && chmod 400 /tmp/mumbai.pem"
