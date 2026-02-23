@@ -58,7 +58,7 @@ pipeline {
         stage('Ansible Configuration - MongoDB') {
             when { expression { params.TF_ACTION == 'apply' } }
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')])  {
                     dir("${env.ANSIBLE_DIRECTORY}") {
                         // Copy SSH key for Ansible to use
                         sh "rm -f /tmp/mumbai.pem && cp ${SSH_KEY} /tmp/mumbai.pem && chmod 400 /tmp/mumbai.pem"
