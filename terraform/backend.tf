@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket  = "oneclick-mongodb"
-    key     = "aws_terraform/terraform.tfstate"
+    bucket  = "sakshi-mongodb-tfstate"
+    key     = "terraform/state.tfstate"
     region  = "ap-south-1"
     encrypt = true
   }
