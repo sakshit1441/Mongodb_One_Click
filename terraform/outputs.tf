@@ -17,4 +17,3 @@ output "alb_dns" {
   description = "DNS name of the application load balancer"
   value       = module.alb.alb_dns
 }
-
