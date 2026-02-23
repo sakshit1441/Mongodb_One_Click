@@ -68,7 +68,7 @@ variable "ansible_user" {
 variable "ssh_key_path" {
   description = "Path to SSH private key for Ansible"
   type        = string
-  default     = "../one__click.pem"
+  default     = "../mumbai_key"
 }
 
 variable "alb_port" {
