@@ -1,4 +1,17 @@
 ########################
+# Fetch latest Ubuntu 22.04 AMI (x86_64 for ap-south-1)
+########################
+data "aws_ami" "ubuntu_22" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical (Ubuntu Official)
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+}
+
+########################
 # Bastion Security Group
 ########################
 resource "aws_security_group" "bastion_sg" {
@@ -23,10 +36,10 @@ resource "aws_security_group" "bastion_sg" {
 }
 
 ########################
-# Bastion EC2 (BLANK)
+# Bastion EC2 Instance
 ########################
 resource "aws_instance" "bastion" {
-  ami           = var.ami_id
+  ami           = data.aws_ami.ubuntu_22.id
   instance_type = var.instance_type
   subnet_id     = var.public_subnet_id
   key_name      = var.key_name
@@ -34,13 +47,17 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
   associate_public_ip_address = true
 
-  # No user_data → blank server
   tags = merge(var.common_tags, {
     Name = "bastion-host"
   })
 }
 
+########################
+# Copy SSH key to Bastion
+########################
 resource "null_resource" "copy_key" {
+  depends_on = [aws_instance.bastion]
+
   triggers = {
     bastion_id = aws_instance.bastion.id
   }
