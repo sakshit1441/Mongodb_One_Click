@@ -29,7 +29,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'aws-cred', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'), sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     dir("${env.TF_DIRECTORY}") {
                         // Copy SSH key for Terraform to use
-                        sh "rm -f /tmp/mumbai.pem && cp ${SSH_KEY} /tmp/mumbai.pem && chmod 400 /tmp/mumbai.pem"
+                        sh "rm -f /tmp/mumbai_key.pem && cp ${SSH_KEY} /tmp/mumbai_key.pem && chmod 400 /tmp/mumbai_key.pem"
                         
                         // Added -input=false and -force-copy to stop Terraform from asking for manual input
                         sh 'terraform init -input=false'
@@ -61,8 +61,8 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'mongo-ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')])  {
                     dir("${env.ANSIBLE_DIRECTORY}") {
                         // Copy SSH key for Ansible to use
-                        sh "rm -f /tmp/mumbai.pem && cp ${SSH_KEY} /tmp/mumbai.pem && chmod 400 /tmp/mumbai.pem"
-                        sh "ansible-playbook -i inventory.ini playbook.yml --private-key=/tmp/mumbai.pem -u ubuntu"
+                        sh "rm -f /tmp/mumbai_key.pem && cp ${SSH_KEY} /tmp/mumbai_key.pem && chmod 400 /tmp/mumbai_key.pem"
+                        sh "ansible-playbook -i inventory.ini playbook.yml --private-key=/tmp/mumbai_key.pem -u ubuntu"
                     }
                 }
             }
@@ -72,7 +72,7 @@ pipeline {
     post { 
         always { 
             // Cleanup sensitive files and workspace
-            sh 'rm -f /tmp/mumbai.pem' 
+            sh 'rm -f /tmp/mumbai_key.pem' 
             cleanWs()
         }
         success {
