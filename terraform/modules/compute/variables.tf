@@ -32,3 +32,9 @@ variable "asg_name" {
 
 variable "common_tags" {
   type = map(string)
+
+  default = {
+    Environment = "dev"
+    Project     = "mongodb"
+  }
+}
