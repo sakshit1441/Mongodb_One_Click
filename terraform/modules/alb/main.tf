@@ -1,19 +1,9 @@
 ##########################
-# ALB Security Group (Reuses existing if found)
+# ALB Security Group
 ##########################
 
-# Try to fetch an existing SG by name
-data "aws_security_group" "existing_alb_sg" {
-  filter {
-    name   = "group-name"
-    values = ["${var.alb_name}-sg"]
-  }
-  vpc_id = var.vpc_id
-}
-
-# Create SG only if it doesn’t exist
 resource "aws_security_group" "alb_sg" {
-  count  = data.aws_security_group.existing_alb_sg.id != "" ? 0 : 1
+  count  = var.create_alb_sg ? 1 : 0
   name   = "${var.alb_name}-sg"
   vpc_id = var.vpc_id
 
@@ -39,20 +29,23 @@ resource "aws_security_group" "alb_sg" {
 }
 
 ##########################
+# Local value to decide SG ID
+##########################
+
+locals {
+  alb_sg_id = var.create_alb_sg ? aws_security_group.alb_sg[0].id : var.existing_alb_sg_id
+}
+
+##########################
 # Application Load Balancer
 ##########################
+
 resource "aws_lb" "this" {
   name               = var.alb_name
   load_balancer_type = "application"
   internal           = false
   subnets            = var.public_subnets
-
-  # ✅ Fixed: uses the existing SG if found, else new one
-  security_groups = (
-    data.aws_security_group.existing_alb_sg.id != "" ?
-    [data.aws_security_group.existing_alb_sg.id] :
-    [aws_security_group.alb_sg[0].id]
-  )
+  security_groups    = [local.alb_sg_id]
 
   tags = var.common_tags
 
@@ -64,6 +57,7 @@ resource "aws_lb" "this" {
 ##########################
 # Target Group
 ##########################
+
 resource "aws_lb_target_group" "tg" {
   name     = "${var.alb_name}-tg"
   port     = var.app_port
@@ -88,6 +82,7 @@ resource "aws_lb_target_group" "tg" {
 ##########################
 # Listener
 ##########################
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
