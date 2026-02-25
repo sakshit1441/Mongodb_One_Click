@@ -71,7 +71,7 @@ resource "null_resource" "copy_key" {
 
   provisioner "file" {
     source      = var.ssh_key_path
-    destination = "/home/ubuntu/mumbai_key"
+    destination = "/tmp/mumbai_key"
   }
 
   provisioner "remote-exec" {
