@@ -28,7 +28,7 @@ asg_name = "mongodb-asg"
 
 # ✅ SSH access settings (Make sure this file exists and has correct permissions)
 ansible_user = "ubuntu"
-ssh_key_path = "/home/sakshi/mumbai_key"
+ssh_key_path = "/tmp/mumbai_key"
 
 # ✅ Application settings
 alb_port = 80
