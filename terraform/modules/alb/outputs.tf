@@ -14,14 +14,10 @@ output "alb_dns" {
   value       = aws_lb.this.dns_name
 }
 
-# ✅ FIX: Handle conditional SG creation (works even if existing SG is reused)
+# Correct Security Group Output
 output "alb_sg_id" {
   description = "Security group ID for the ALB"
-  value = (
-    data.aws_security_group.existing_alb_sg.id != "" ?
-    data.aws_security_group.existing_alb_sg.id :
-    aws_security_group.alb_sg[0].id
-  )
+  value       = local.alb_sg_id
 }
 
 # ALB ARN
