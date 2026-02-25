@@ -3,7 +3,7 @@
 ########################
 data "aws_ami" "ubuntu_22" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical (Ubuntu Official)
+  owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
@@ -50,33 +50,4 @@ resource "aws_instance" "bastion" {
   tags = merge(var.common_tags, {
     Name = "bastion-host"
   })
-}
-
-########################
-# Copy SSH key to Bastion
-########################
-resource "null_resource" "copy_key" {
-  depends_on = [aws_instance.bastion]
-
-  triggers = {
-    bastion_id = aws_instance.bastion.id
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("/tmp/mumbai_key")
-    host        = aws_instance.bastion.public_ip
-  }
-
-  provisioner "file" {
-    source      = var.ssh_key_path
-    destination = "/tmp/mumbai_key"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod 400 /home/ubuntu/mumbai_key"
-    ]
-  }
 }
