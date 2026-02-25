@@ -65,7 +65,7 @@ resource "null_resource" "copy_key" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.ssh_key_path)
+    private_key = file("/tmp/mumbai_key")
     host        = aws_instance.bastion.public_ip
   }
 
