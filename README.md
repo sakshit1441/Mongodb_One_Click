@@ -23,13 +23,6 @@ graph TD
         ASG[Auto Scaling Group]
     end
 
-
-    T --> VPC
-    A --> BAS
-    A --> ASG
-    D --> NGX
-    D --> API
-    D --> DB
 ```
 
 ---
@@ -85,5 +78,3 @@ The pipeline will automatically:
 
 ---
 
-## 📄 License
-MIT
