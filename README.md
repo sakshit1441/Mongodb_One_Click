@@ -13,7 +13,7 @@ graph TD
     subgraph "CI/CD & Automation"
         J[Jenkins Pipeline] --> T[Terraform: AWS Provisioning]
         J --> A[Ansible: Configuration Management]
-        J --> D[Docker Compose: Application Deployment]
+      
     end
 
     subgraph "AWS Infrastructure"
@@ -23,11 +23,6 @@ graph TD
         ASG[Auto Scaling Group]
     end
 
-    subgraph "Application Stack (Docker)"
-        NGX[Nginx Frontend]
-        API[Node.js Backend]
-        DB[MySQL Database]
-    end
 
     T --> VPC
     A --> BAS
@@ -65,10 +60,6 @@ The pipeline will automatically:
 
 - **`/terraform`**: Infrastructure as Code. Defines AWS resources (VPC, ALB, ASG, Bastion).
 - **`/ansible`**: Configuration management. Installs Docker and manages server setup.
-- **`/docker`**: The core application logic.
-    - **`/backend`**: Node.js Express API.
-    - **`/nginx`**: Frontend UI served via Nginx.
-    - **`/database`**: MySQL initialization scripts.
 - **`Jenkinsfile`**: Orchestrates the entire deployment lifecycle.
 
 ---
@@ -83,23 +74,6 @@ The pipeline will automatically:
 ### 2. Ansible (Provisioning)
 - Automates Docker and Docker Compose installation.
 - Dynamically generates inventory based on Terraform outputs.
-
-### 3. Employee Management App (Docker)
-- **Frontend**: Modern gradient UI with full CRUD functionality.
-- **Backend API**: Robust Node.js service with MySQL connection pooling.
-- **Reliability**: Health checks and automated single-quote fix for name stability.
-
----
-
-## 🔧 Manual Deployment (Local/Dev)
-
-To run the application locally for development:
-
-```bash
-cd docker
-docker-compose up -d --build
-```
-Access the application at `http://localhost:3000`.
 
 ---
 
