@@ -9,10 +9,6 @@
 - name: Configure MongoDB
   hosts: mongodb
   become: true
-  gather_facts:
-    no # facts gathering might fail if python not installed, but we need facts for package manager.
-    # Ubuntu 22.04 usually has python3.
-    # We can set gather_facts: yes and use raw module to install python if needed,
-    # but assume standard AMI has it.
+  gather_facts: no 
   roles:
     - mongodb
